@@ -162,27 +162,6 @@ namespace LevelDB
         }
 
         [Test]
-        public void Enumerator()
-        {
-            Database.Put(null, "key1", "value1");
-            Database.Put(null, "key2", "value2");
-            Database.Put(null, "key3", "value3");
-
-            var entries = new List<KeyValuePair<string, string>>();
-            foreach (var entry in Database) {
-                entries.Add(entry);
-            }
-
-            Assert.AreEqual(3, entries.Count);
-            Assert.AreEqual("key1", entries[0].Key);
-            Assert.AreEqual("value1", entries[0].Value);
-            Assert.AreEqual("key2", entries[1].Key);
-            Assert.AreEqual("value2", entries[1].Value);
-            Assert.AreEqual("key3", entries[2].Key);
-            Assert.AreEqual("value3", entries[2].Value);
-        }
-
-        [Test]
         public void Cache()
         {
             Database.Dispose();

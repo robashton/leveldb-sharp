@@ -32,6 +32,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LevelDB
 {
@@ -50,7 +51,7 @@ namespace LevelDB
     /// If two threads share such an object, they must protect access to it
     /// using their own locking protocol.
     /// </remarks>
-    public class DB : IDisposable, IEnumerable<KeyValuePair<string, string>>
+    public class DB : IDisposable
     {
         /// <summary>
         /// Native handle
@@ -59,7 +60,7 @@ namespace LevelDB
         Options Options { get; set; }
         bool Disposed { get; set; }
 
-        public string this[string key] {
+        public Byte[] this[string key] {
             get {
                 return Get(null, key);
             }
@@ -137,7 +138,7 @@ namespace LevelDB
             Native.leveldb_destroy_db(options.Handle, path);
         }
 
-        public void Put(WriteOptions options, string key, string value)
+        public void Put(WriteOptions options, string key, Byte[] value)
         {
             CheckDisposed();
             if (options == null) {
@@ -146,9 +147,23 @@ namespace LevelDB
             Native.leveldb_put(Handle, options.Handle, key, value);
         }
 
-        public void Put(string key, string value)
+        public void Put(WriteOptions options, string key, string value)
+        {
+            CheckDisposed();
+            if (options == null) {
+                options = new WriteOptions();
+            }
+            Native.leveldb_put(Handle, options.Handle, key, Encoding.UTF8.GetBytes(value));
+        }
+
+        public void Put(string key, Byte[] value)
         {
             Put(null, key, value);
+        }
+
+        public void Put(string key, string value)
+        {
+            Put(null, key, Encoding.UTF8.GetBytes(value));
         }
 
         public void Delete(WriteOptions options, string key)
@@ -182,7 +197,7 @@ namespace LevelDB
             Write(null, writeBatch);
         }
 
-        public string Get(ReadOptions options, string key)
+        public Byte[] Get(ReadOptions options, string key)
         {
             CheckDisposed();
             if (options == null) {
@@ -191,20 +206,9 @@ namespace LevelDB
             return Native.leveldb_get(Handle, options.Handle, key);
         }
 
-        public string Get(string key)
+        public Byte[] Get(string key)
         {
             return Get(null, key);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            CheckDisposed();
-            return new Iterator(this, null);
         }
 
         public Snapshot CreateSnapshot()

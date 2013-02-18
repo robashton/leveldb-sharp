@@ -32,6 +32,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+// Rob's notes: iterating and unpacking at the same time is expensive and naive
+// We should have a Slice implementation or at least something similar
 namespace LevelDB
 {
     /// <summary>

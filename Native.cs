@@ -31,6 +31,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
+using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 
@@ -79,20 +80,33 @@ namespace LevelDB
                                               IntPtr writeOptions,
                                               string key,
                                               UIntPtr keyLength,
-                                              string value,
+                                              IntPtr value,
                                               UIntPtr valueLength,
                                               out string error);
+
         public static void leveldb_put(IntPtr db,
                                        IntPtr writeOptions,
                                        string key,
-                                       string value)
+                                       Byte[] value)
         {
             string error;
             var keyLength = GetStringLength(key);
-            var valueLength = GetStringLength(value);
-            Native.leveldb_put(db, writeOptions,
+            var valueLength = new UIntPtr((uint) value.Length);
+            IntPtr unmanagedPointer = IntPtr.Zero;
+            try
+            {
+                unmanagedPointer = Marshal.AllocHGlobal(value.Length);
+                Marshal.Copy(value, 0, unmanagedPointer, value.Length);
+                Native.leveldb_put(db, writeOptions,
                                key, keyLength,
-                               value, valueLength, out error);
+                               unmanagedPointer, valueLength, out error);
+            }
+            finally
+            {
+                if(unmanagedPointer != IntPtr.Zero)
+                    Marshal.FreeHGlobal(unmanagedPointer);
+            }
+
             CheckError(error);
         }
 
@@ -125,7 +139,7 @@ namespace LevelDB
                                                 UIntPtr keyLength,
                                                 out UIntPtr valueLength,
                                                 out string error);
-        public static string leveldb_get(IntPtr db,
+        public static Byte[] leveldb_get(IntPtr db,
                                          IntPtr readOptions,
                                          string key)
         {
@@ -138,8 +152,12 @@ namespace LevelDB
             if (valuePtr == IntPtr.Zero || valueLength == UIntPtr.Zero) {
                 return null;
             }
-            var value = Marshal.PtrToStringAnsi(valuePtr, (int) valueLength);
-            return value;
+            var output = new byte[(int)valueLength];
+            Marshal.Copy(valuePtr, output, 0, (int)valueLength);
+
+            
+
+            return output;
         }
 
         // extern leveldb_iterator_t* leveldb_create_iterator(leveldb_t* db, const leveldb_readoptions_t* options);

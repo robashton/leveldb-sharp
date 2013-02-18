@@ -1,0 +1,5 @@
+C:\Users\TestRunner\Documents\Rob\leveldb-sharp\bin\Debug\leveldb-sharp.dll.config
+C:\Users\TestRunner\Documents\Rob\leveldb-sharp\bin\Debug\leveldb-sharp.dll
+C:\Users\TestRunner\Documents\Rob\leveldb-sharp\bin\Debug\leveldb-sharp.pdb
+C:\Users\TestRunner\Documents\Rob\leveldb-sharp\obj\Debug\leveldb-sharp.dll
+C:\Users\TestRunner\Documents\Rob\leveldb-sharp\obj\Debug\leveldb-sharp.pdb
